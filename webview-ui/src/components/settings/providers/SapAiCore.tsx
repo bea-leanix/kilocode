@@ -60,6 +60,12 @@ const SapAiCore = ({ apiConfiguration, setApiConfigurationField }: SapAiCoreProp
 		})
 	}, [sapAiCoreConfiguration])
 
+	const clearModelSelection = useCallback(() => {
+		// Clear model-related fields when toggling orchestration
+		const fieldsToReset = ["sapAiCoreModelId", "sapAiCoreCustomModelInfo", "sapAiCoreDeploymentId"]
+		fieldsToReset.forEach((field) => setApiConfigurationField(field as keyof ProviderSettings, undefined))
+	}, [setApiConfigurationField])
+
 	const handleInputChange = useCallback(
 		<K extends keyof ProviderSettings, E>(
 			field: K,
@@ -68,11 +74,12 @@ const SapAiCore = ({ apiConfiguration, setApiConfigurationField }: SapAiCoreProp
 			(event: E | Event) => {
 				setApiConfigurationField(field, transform(event as E))
 				if (REFETCH_FIELDS.includes(field as any)) {
+					clearModelSelection()
 					fetchModels()
 					fetchDeployments()
 				}
 			},
-		[setApiConfigurationField, fetchModels, fetchDeployments],
+		[setApiConfigurationField, fetchModels, fetchDeployments, clearModelSelection],
 	)
 
 	useEffect(() => {
@@ -109,9 +116,7 @@ const SapAiCore = ({ apiConfiguration, setApiConfigurationField }: SapAiCoreProp
 	}
 
 	const handleUseOrchestrationSelect = (useOrchestration: boolean) => {
-		// Clear model-related fields when toggling orchestration
-		const fieldsToReset = ["sapAiCoreModelId", "sapAiCoreCustomModelInfo", "sapAiCoreDeploymentId"]
-		fieldsToReset.forEach((field) => setApiConfigurationField(field as keyof ProviderSettings, undefined))
+		clearModelSelection()
 		setApiConfigurationField("sapAiCoreUseOrchestration", useOrchestration)
 	}
 
