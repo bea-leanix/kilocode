@@ -452,6 +452,17 @@ function getSelectedModel({
 			return { id, info }
 		}
 		// kilocode_change end
+		case "sap-ai-core": {
+			const id = apiConfiguration.sapAiCoreModelId ?? "gpt-5"
+			const info = {
+				maxTokens: 128000,
+				contextWindow: 400000,
+				supportsImages: true,
+				supportsPromptCache: true,
+				description: "GPT-5: The best model for coding and agentic tasks across domains",
+			}
+			return { id, info }
+		}
 		// case "anthropic":
 		// case "human-relay":
 		// case "fake-ai":
@@ -469,11 +480,11 @@ function getSelectedModel({
 			// Apply 1M context beta tier pricing for Claude Sonnet 4
 			if (
 				provider === "anthropic" &&
-				id === "claude-sonnet-4-20250514" &&
+				(id === "claude-sonnet-4-20250514" || id === "claude-sonnet-4-5") &&
 				apiConfiguration.anthropicBeta1MContext &&
 				baseInfo
 			) {
-				// Type assertion since we know claude-sonnet-4-20250514 has tiers
+				// Type assertion since we know claude-sonnet-4-20250514 and claude-sonnet-4-5 have tiers
 				const modelWithTiers = baseInfo as typeof baseInfo & {
 					tiers?: Array<{
 						contextWindow: number

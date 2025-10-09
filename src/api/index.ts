@@ -45,7 +45,8 @@ import {
 	FeatherlessHandler,
 	VercelAiGatewayHandler,
 	DeepInfraHandler,
-	OVHCloudAIEndpointsHandler, // kilocode_change
+	OVHcloudAIEndpointsHandler, // kilocode_change
+	SapAiCoreHandler,
 } from "./providers"
 // kilocode_change start
 import { KilocodeOpenrouterHandler } from "./providers/kilocode-openrouter"
@@ -190,8 +191,10 @@ export function buildApiHandler(configuration: ProviderSettings): ApiHandler {
 			return new VercelAiGatewayHandler(options)
 		// kilocode_change start
 		case "ovhcloud":
-			return new OVHCloudAIEndpointsHandler(options)
+			return new OVHcloudAIEndpointsHandler(options)
 		// kilocode_change end
+		case "sap-ai-core":
+			return new SapAiCoreHandler(options)
 		default:
 			apiProvider satisfies "gemini-cli" | undefined
 			return new AnthropicHandler(options)

@@ -81,6 +81,7 @@ import { setPendingTodoList } from "../tools/updateTodoListTool"
 import { UsageTracker } from "../../utils/usage-tracker"
 import { seeNewChanges } from "../checkpoints/kilocode/seeNewChanges" // kilocode_change
 import { getTaskHistory } from "../../shared/kilocode/getTaskHistory" // kilocode_change
+import { getSapAiCoreDeployments } from "../../api/providers/fetchers/sap-ai-core" // kilocode_change
 
 export const webviewMessageHandler = async (
 	provider: ClineProvider,
@@ -804,6 +805,7 @@ export const webviewMessageHandler = async (
 				ollama: {},
 				lmstudio: {},
 				ovhcloud: {}, // kilocode_change
+				"sap-ai-core": {},
 			}
 
 			const safeGetModels = async (options: GetModelsOptions): Promise<ModelRecord> => {
@@ -860,7 +862,11 @@ export const webviewMessageHandler = async (
 				// kilocode_change start
 				{
 					key: "ovhcloud",
-					options: { provider: "ovhcloud", apiKey: apiConfiguration.ovhCloudAiEndpointsApiKey },
+					options: {
+						provider: "ovhcloud",
+						apiKey: apiConfiguration.ovhCloudAiEndpointsApiKey,
+						baseUrl: apiConfiguration.ovhCloudAiEndpointsBaseUrl,
+					},
 				},
 				// kilocode_change end
 			]
@@ -1011,6 +1017,49 @@ export const webviewMessageHandler = async (
 				provider.postMessageToWebview({ type: "huggingFaceModels", huggingFaceModels: [] })
 			}
 			break
+		case "requestSapAiCoreModels": {
+			// Specific handler for SAP AI Core models only.
+			if (message?.values?.sapAiCoreServiceKey) {
+				try {
+					// Flush cache first to ensure fresh models.
+					await flushModels("sap-ai-core")
+
+					const sapAiCoreModels = await getModels({
+						provider: "sap-ai-core",
+						sapAiCoreServiceKey: message?.values?.sapAiCoreServiceKey,
+						sapAiCoreResourceGroup: message?.values?.sapAiCoreResourceGroup,
+						sapAiCoreUseOrchestration: message?.values?.sapAiCoreUseOrchestration,
+					})
+
+					if (Object.keys(sapAiCoreModels).length > 0) {
+						provider.postMessageToWebview({ type: "sapAiCoreModels", sapAiCoreModels: sapAiCoreModels })
+					}
+				} catch (error) {
+					console.error("SAP AI Core models fetch failed:", error)
+				}
+			}
+			break
+		}
+		case "requestSapAiCoreDeployments": {
+			if (message?.values?.sapAiCoreServiceKey) {
+				try {
+					const sapAiCoreDeployments = await getSapAiCoreDeployments(
+						message?.values?.sapAiCoreServiceKey,
+						message?.values?.sapAiCoreResourceGroup,
+					)
+
+					if (Object.keys(sapAiCoreDeployments).length > 0) {
+						provider.postMessageToWebview({
+							type: "sapAiCoreDeployments",
+							sapAiCoreDeployments: sapAiCoreDeployments,
+						})
+					}
+				} catch (error) {
+					console.error("SAP AI Core deployments fetch failed:", error)
+				}
+			}
+			break
+		}
 		case "openImage":
 			openImage(message.text!, { values: message.values })
 			break

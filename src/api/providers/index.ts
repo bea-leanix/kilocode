@@ -21,7 +21,7 @@ export { OllamaHandler } from "./ollama"
 export { OpenAiNativeHandler } from "./openai-native"
 export { OpenAiHandler } from "./openai"
 export { OpenRouterHandler } from "./openrouter"
-export { OVHCloudAIEndpointsHandler } from "./ovhcloud" // kilocode_change
+export { OVHcloudAIEndpointsHandler } from "./ovhcloud" // kilocode_change
 export { QwenCodeHandler } from "./qwen-code"
 export { RequestyHandler } from "./requesty"
 export { SambaNovaHandler } from "./sambanova"
@@ -40,3 +40,4 @@ export { RooHandler } from "./roo"
 export { FeatherlessHandler } from "./featherless"
 export { VercelAiGatewayHandler } from "./vercel-ai-gateway"
 export { DeepInfraHandler } from "./deepinfra"
+export { SapAiCoreHandler } from "./sap-ai-core"
